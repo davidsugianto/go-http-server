@@ -16,9 +16,9 @@ var (
 )
 
 func main() {
-	flag.StringVar(&errLogPath, "error_log", "/app/log/go-http-server.error.log", "error log")
-	flag.StringVar(&infoLogPath, "info_log", "/app/log/go-http-server.info.log", "info log")
-	flag.StringVar(&debugLogPath, "debug_log", "/app/log/go-http-server.debug.log", "debug log")
+	flag.StringVar(&errLogPath, "error_log", "/tmp/idp-core.error.log", "error log")
+	flag.StringVar(&infoLogPath, "info_log", "/tmp/idp-core.info.log", "info log")
+	flag.StringVar(&debugLogPath, "debug_log", "/tmp/idp-core.debug.log", "debug log")
 	flag.Parse()
 
 	setLog(logs.ErrorLevel, errLogPath)
