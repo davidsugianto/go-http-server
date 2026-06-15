@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-http-server
+    ports:
+      - "7979:7979"
+    environment:
+      - ENV=development
+    restart: unless-stopped
