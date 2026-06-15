@@ -25,7 +25,7 @@ func main() {
 	setLog(logs.InfoLevel, infoLogPath)
 	setLog(logs.DebugLevel, debugLogPath)
 
-	logs.Info("Starting Go HTTP Server")
+	logs.Info("Starting Go HTTP Server in %s mode", os.Getenv("ENV"))
 
 	// load config
 	cfgPath := fmt.Sprintf("configs/config.%s.yaml", os.Getenv("ENV"))
