@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: go-http-server-config
+  namespace: go-http-server
+  labels:
+    app.kubernetes.io/name: go-http-server
+    app.kubernetes.io/component: api-server
+data:
+  PORT: "7979"
+  ENV: "production"

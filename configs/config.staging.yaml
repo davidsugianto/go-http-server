@@ -1,0 +1,19 @@
+server:
+  port: 7979
+
+cors:
+  allowed_origins:
+    - "http://localhost:7979"
+  allowed_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "PATCH"
+    - "OPTIONS"
+  allowed_headers:
+    - "Content-Type"
+    - "Authorization"
+    - "X-Request-ID"
+    - "X-API-Key"
+  allow_credentials: true
