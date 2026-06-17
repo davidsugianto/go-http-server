@@ -18,6 +18,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
 
+permissions:
+  contents: write
+
 jobs:
   build-and-push:
     uses: davidsugianto/shared-workflows/.github/workflows/go-docker-ci.yaml@master
@@ -36,7 +39,7 @@ jobs:
     with:
       image: "docker.io/idiots718/go-http-server"
       tag: ${{ needs.build-and-push.outputs.image-tag }}
-      kustomize-path: "deployments/kubernetes/overlays/staging/kustomization.yaml"
+      kustomize-path: "deployments/kubernetes/overlays/staging"
     secrets:
       GIT_TOKEN: ${{ secrets.PAT_TOKEN }}
 
@@ -47,6 +50,6 @@ jobs:
     with:
       image: "docker.io/idiots718/go-http-server"
       tag: ${{ needs.build-and-push.outputs.image-tag }}
-      kustomize-path: "deployments/kubernetes/overlays/production/kustomization.yaml"
+      kustomize-path: "deployments/kubernetes/overlays/production"
     secrets:
       GIT_TOKEN: ${{ secrets.PAT_TOKEN }}

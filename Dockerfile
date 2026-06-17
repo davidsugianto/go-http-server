@@ -7,7 +7,8 @@ WORKDIR /app
 COPY go.mod go.sum* ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH:-amd64} \
     go build -ldflags="-w -s" -o /app/go-http-server ./cmd/server
 
 # =============================================================================
@@ -16,9 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 FROM alpine:3.19 AS production
 RUN apk --no-cache add ca-certificates tzdata
 WORKDIR /app
-RUN mkdir -p log/go-http-server \
-    && adduser -D -g '' -u 1000 appuser \
-    && chown -R appuser:appuser log/
+RUN adduser -D -g '' -u 1000 appuser
 COPY --from=builder --chown=appuser:appuser /app/configs/ ./configs/
 COPY --from=builder --chown=appuser:appuser /app/go-http-server .
 USER appuser
