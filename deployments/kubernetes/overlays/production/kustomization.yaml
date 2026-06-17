@@ -4,39 +4,39 @@ kind: Kustomization
 namespace: go-http-server
 
 resources:
-  - ../../base
+- ../../base
 
 # Production-specific patches
 patches:
-  - patch: |-
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: go-http-server
-        namespace: go-http-server
-      spec:
-        replicas: 3
-        template:
-          spec:
-            containers:
-              - name: go-http-server
-                resources:
-                  requests:
-                    cpu: "200m"
-                    memory: "256Mi"
-                  limits:
-                    cpu: "1000m"
-                    memory: "1Gi"
-  - patch: |-
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: go-http-server-config
-        namespace: go-http-server
-      data:
-        ENV: "production"
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: go-http-server
+      namespace: go-http-server
+    spec:
+      replicas: 3
+      template:
+        spec:
+          containers:
+            - name: go-http-server
+              resources:
+                requests:
+                  cpu: "200m"
+                  memory: "256Mi"
+                limits:
+                  cpu: "1000m"
+                  memory: "1Gi"
+- patch: |-
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: go-http-server-config
+      namespace: go-http-server
+    data:
+      ENV: "production"
 
 # Image tags for production
 images:
-  - name: docker.io/idiots718/go-http-server
-    newTag: latest
+- name: docker.io/idiots718/go-http-server
+  newTag: master
