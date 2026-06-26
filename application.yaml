@@ -1,0 +1,12 @@
+apiVersion: idp.dev/v1alpha1
+kind: Application
+metadata:
+  name: go-http-server
+spec:
+  runtime: go
+  port: 7979
+  healthCheck:
+    path: /v1/ping
+  env:
+    - name: ENV
+      value: development
