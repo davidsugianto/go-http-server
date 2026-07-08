@@ -12,6 +12,7 @@ on:
     branches:
       - master
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -26,7 +27,7 @@ jobs:
 
   deploy-dev:
     needs: build
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     uses: davidsugianto/shared-workflows/.github/workflows/kustomize-image-tag.yaml@master
     with:
       gitops-repo: davidsugianto/idp-gitops-manifests
