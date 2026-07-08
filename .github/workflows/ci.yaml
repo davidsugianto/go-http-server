@@ -1,55 +1,57 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "master", "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'deployments/**'
-      - '.gitignore'
-      - 'Makefile'
+    branches:
+      - master
+      - main
+      - 'release/**'
+    tags:
+      - 'v*.*.*'
   pull_request:
-    branches: [ "master", "main" ]
-    paths-ignore:
-      - '**.md'
-      - 'deployments/**'
+    branches:
+      - master
+      - main
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main' }}
-
-permissions:
-  contents: write
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ github.repository }}
+  GITOPS_REPO: davidsugianto/idp-gitops-manifests
+  SERVICE_NAME: go-http-server
 
 jobs:
-  build-and-push:
+  build:
     uses: davidsugianto/shared-workflows/.github/workflows/go-docker-ci.yaml@master
     with:
       go-version: "1.25"
-      image-name: "docker.io/idiots718/go-http-server"
+      image-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
       run-tests: false
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  update-image-tag-staging:
-    needs: build-and-push
-    if: github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main'
+  deploy-staging:
+    needs: build
+    if: startsWith(github.ref, 'refs/heads/release/')
     uses: davidsugianto/shared-workflows/.github/workflows/kustomize-image-tag.yaml@master
     with:
-      image: "docker.io/idiots718/go-http-server"
-      tag: ${{ needs.build-and-push.outputs.image-tag }}
-      kustomize-path: "deployments/kubernetes/overlays/staging"
+      gitops-repo: ${{ env.GITOPS_REPO }}
+      image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      tag: staging-latest
+      kustomize-path: environments/staging/${{ env.SERVICE_NAME }}
+      create-pr: true
     secrets:
-      GIT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      git-token: ${{ secrets.PAT_TOKEN }}
 
-  update-image-tag-production:
-    needs: build-and-push
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+  deploy-prod:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
     uses: davidsugianto/shared-workflows/.github/workflows/kustomize-image-tag.yaml@master
     with:
-      image: "docker.io/idiots718/go-http-server"
-      tag: ${{ needs.build-and-push.outputs.image-tag }}
-      kustomize-path: "deployments/kubernetes/overlays/production"
+      gitops-repo: ${{ env.GITOPS_REPO }}
+      image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      tag: ${{ github.ref_name }}
+      kustomize-path: environments/prod/${{ env.SERVICE_NAME }}
+      create-pr: true
     secrets:
-      GIT_TOKEN: ${{ secrets.PAT_TOKEN }}
+      git-token: ${{ secrets.PAT_TOKEN }}
