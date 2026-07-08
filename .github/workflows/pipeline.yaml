@@ -13,12 +13,16 @@ on:
       - master
       - main
 
+env:
+  SERVICE_NAME: go-http-server
+  REGISTRY: docker.io/idiots718
+
 jobs:
   build:
     uses: davidsugianto/shared-workflows/.github/workflows/go-docker-ci.yaml@master
     with:
       go-version: "1.25"
-      image-name: docker.io/${{ github.repository }}
+      image-name: ${{ env.REGISTRY }}/${{ env.SERVICE_NAME }}
       run-tests: false
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -30,9 +34,9 @@ jobs:
     uses: davidsugianto/shared-workflows/.github/workflows/kustomize-image-tag.yaml@master
     with:
       gitops-repo: davidsugianto/idp-gitops-manifests
-      image: docker.io/${{ github.repository }}
+      image: ${{ env.REGISTRY }}/${{ env.SERVICE_NAME }}
       tag: staging-latest
-      kustomize-path: environments/staging/go-http-server
+      kustomize-path: environments/staging/${{ env.SERVICE_NAME }}
       create-pr: true
     secrets:
       git-token: ${{ secrets.PAT_TOKEN }}
@@ -43,9 +47,9 @@ jobs:
     uses: davidsugianto/shared-workflows/.github/workflows/kustomize-image-tag.yaml@master
     with:
       gitops-repo: davidsugianto/idp-gitops-manifests
-      image: docker.io/${{ github.repository }}
+      image: ${{ env.REGISTRY }}/${{ env.SERVICE_NAME }}
       tag: ${{ github.ref_name }}
-      kustomize-path: environments/prod/go-http-server
+      kustomize-path: environments/prod/${{ env.SERVICE_NAME }}
       create-pr: true
     secrets:
       git-token: ${{ secrets.PAT_TOKEN }}
