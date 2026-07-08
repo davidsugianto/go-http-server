@@ -6,5 +6,5 @@ import (
 )
 
 func (h *Handler) Ping(c *gin.Context) {
-	response.GinSuccess(c, gin.H{"status": "ok"})
+	response.GinSuccess(c, gin.H{"status": "ok test"})
 }
