@@ -24,6 +24,19 @@ jobs:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
+  deploy-dev:
+    needs: build
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+    uses: davidsugianto/shared-workflows/.github/workflows/kustomize-image-tag.yaml@master
+    with:
+      gitops-repo: davidsugianto/idp-gitops-manifests
+      image: docker.io/idiots718/go-http-server
+      tag: ${{ needs.build.outputs.image-tag }}
+      kustomize-path: environments/dev/go-http-server
+      create-pr: true
+    secrets:
+      git-token: ${{ secrets.PAT_TOKEN }}
+
   deploy-staging:
     needs: build
     if: startsWith(github.ref, 'refs/heads/release/')
@@ -31,7 +44,7 @@ jobs:
     with:
       gitops-repo: davidsugianto/idp-gitops-manifests
       image: docker.io/idiots718/go-http-server
-      tag: staging-latest
+      tag: ${{ needs.build.outputs.image-tag }}
       kustomize-path: environments/staging/go-http-server
       create-pr: true
     secrets:
@@ -44,7 +57,7 @@ jobs:
     with:
       gitops-repo: davidsugianto/idp-gitops-manifests
       image: docker.io/idiots718/go-http-server
-      tag: ${{ github.ref_name }}
+      tag: ${{ needs.build.outputs.image-tag }}
       kustomize-path: environments/prod/go-http-server
       create-pr: true
     secrets:
